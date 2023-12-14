@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Joi = require("joi");
 const { db } = require("../services/db.js");
+const { getUserJwt } = require("../services/auth.js");
 
 // GET /users/signin
 router.get("/signin", function (req, res, next) {
@@ -28,9 +29,14 @@ router.post("/signin", function (req, res, next) {
 
   const stmt = db.prepare("SELECT * FROM users WHERE email = ? AND password = ?");
   const dbResult = stmt.get(email, password);
-  console.log("DB Result", dbResult);
+  console.log("DB RESULT", dbResult);
+  if (dbResult) {
+    const token = getUserJwt(dbResult.id, dbResult.email, dbResult.name, dbResult.role);
+    console.log("NEW TOKEN", token);
+    res.cookie("auth", token);
 
-  res.render("users/signin", { result: { success: true } });
+    res.render("users/signin", { result: { success: true } });
+  }
 });
 
 module.exports = router;
