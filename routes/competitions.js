@@ -1,14 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const { checkAuthCookie } = require("../services/auth.js");
+const { authRequired } = require("../services/auth.js");
 
-router.get("/", checkAuthCookie, function (req, res, next) {
-    if (req.user) {
-        console.log("Slobodan ulaz");
-    } else {
-        console.log("Zabranje ulaz");
-    }
-
+router.get("/", authRequired, function (req, res, next) {
     res.render("competitions/index");
 });
 
