@@ -33,12 +33,19 @@ function parseAuthCookie(req, res, next) {
     }
     req.user = result;
     res.locals.user = result;
+    res.locals.user.is_admin = result.role === "admin" ? true : false;
     next();
 }
 
 // MIDDLEWARE FOR AUTHENTICATION CHECK
 function authRequired(req, res, next) {
     if (!req.user) throw new Error("Potrebna je prijava u sustav");
+    next();
+}
+
+// MIDDLEWARE FOR ADMIN CHECK
+function adminRequired(req, res, next) {
+    if (!req.user || req.user.role !== "admin") throw new Error("Dopušteno samo administratorima");
     next();
 }
 
@@ -57,5 +64,6 @@ module.exports = {
     getUserJwt,
     parseAuthCookie,
     authRequired,
-    checkEmailUnique
+    checkEmailUnique,
+    adminRequired
 };
